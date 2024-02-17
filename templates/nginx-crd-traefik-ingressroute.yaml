@@ -1,0 +1,37 @@
+{{- /*
+Author KYH.
+blue app traefik ingress route CRD
+*/}}
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: nginx-blue-ingressroute
+  namespace: study-helm
+spec:
+  entryPoints:
+  - web
+  routes:
+  - match: Host(`blue.myweb.com`)
+    kind: Rule
+    services:
+    - name: nginx-blue-service
+      port: 80
+---
+{{- /*
+Author KYH.
+green app traefik ingress route CRD
+*/}}
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: nginx-green-ingressroute
+  namespace: study-helm
+spec:
+  entryPoints:
+  - web
+  routes:
+  - match: Host(`green.myweb.com`)
+    kind: Rule
+    services:
+    - name: nginx-green-service
+      port: 80

@@ -1,0 +1,17 @@
+{{- /*
+Author KYH.
+nginx pod reader role
+*/}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: podreader-role
+  namespace: study-helm
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+  - list

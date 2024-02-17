@@ -1,0 +1,40 @@
+{{- /*
+Author KYH.
+blue app service
+*/}}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: nginx-blue-service
+    app.kubernetes.io/managed-by: Helm
+  name: nginx-blue-service
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: blue
+  type: null
+---
+{{- /*
+Author KYH.
+green app service
+*/}}
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: nginx-green-service
+    app.kubernetes.io/managed-by: Helm
+  name: nginx-green-service
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: green
+  type: null

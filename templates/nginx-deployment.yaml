@@ -1,0 +1,111 @@
+{{- /*
+Author KYH.
+blue app deployment
+*/}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: nginx-blue-deployment
+  name: nginx-blue-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: blue
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: blue
+    spec:
+      serviceAccountName: nginx-sa
+      containers:
+      - name: hello
+        image: nginxdemos/hello:0.4-plain-text
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          # allowPrivilegeEscalation: false
+          # privileged: false
+          # readOnlyRootFilesystem: true
+          # runAsNonRoot: true
+          # runAsUser: 1001
+          # runAsGroup: 1001
+        startupProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          failureThreshold: 3
+        resources:
+          requests:
+            memory: "30Mi"
+            cpu: "30m"
+          limits:
+            memory: "50Mi"
+            cpu: "100m"
+        volumeMounts:
+        - name: openebs-hostpath
+          mountPath: /var/log/nginx
+      volumes:
+      - name: emptydir
+        emptyDir: {}
+      - name: openebs-hostpath
+        persistentVolumeClaim:
+          claimName: nginx-pvc
+---
+{{- /*
+Author KYH.
+green app deployment
+*/}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: nginx-green-deployment
+  name: nginx-green-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: green
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: green
+    spec:
+      serviceAccountName: nginx-sa
+      containers:
+      - name: hello
+        image: nginxdemos/hello:0.4-plain-text
+        imagePullPolicy: IfNotPresent
+        # securityContext:
+        #   allowPrivilegeEscalation: false
+        #   privileged: false
+        #   readOnlyRootFilesystem: true
+        #   runAsNonRoot: true
+        startupProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          failureThreshold: 3
+        resources:
+          requests:
+            memory: "30Mi"
+            cpu: "30m"
+          limits:
+            memory: "50Mi"
+            cpu: "100m"
+        volumeMounts:
+        - name: emptydir
+          mountPath: /var/log/nginx
+      volumes:
+      - name: emptydir
+        emptyDir: {}
+      - name: openebs-hostpath
+        persistentVolumeClaim:
+          claimName: nginx-pvc
