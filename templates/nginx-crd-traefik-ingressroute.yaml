@@ -15,7 +15,12 @@ spec:
     kind: Rule
     services:
     - name: nginx-blue-service
-      port: 80
+    {{- if .Values.containerPorts.http }}
+      port: {{ .Values.service.ports.http }}
+    {{- end }}
+    {{- if .Values.containerPorts.https }}
+      port: {{ .Values.service.ports.https }}
+    {{- end }}
 ---
 {{- /*
 Author KYH.
@@ -34,4 +39,9 @@ spec:
     kind: Rule
     services:
     - name: nginx-green-service
-      port: 80
+    {{- if .Values.containerPorts.http }}
+      port: {{ .Values.service.ports.http }}
+    {{- end }}
+    {{- if .Values.containerPorts.https }}
+      port: {{ .Values.service.ports.https }}
+    {{- end }}
