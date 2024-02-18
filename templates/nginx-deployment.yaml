@@ -2,110 +2,94 @@
 Author KYH.
 blue app deployment
 */}}
-apiVersion: apps/v1
+apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
 kind: Deployment
 metadata:
   labels:
     app: nginx-blue-deployment
   name: nginx-blue-deployment
 spec:
-  replicas: 3
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
   selector:
     matchLabels:
       app: blue
-  strategy: {}
+  {{- if .Values.updateStrategy }}
+  strategy: {{- toYaml .Values.updateStrategy | nindent 4 }}
+  {{- end }}
   template:
     metadata:
-      creationTimestamp: null
       labels:
         app: blue
     spec:
-      serviceAccountName: nginx-sa
+      {{- if .Values.serviceAccount.enabled }}
+      serviceAccountName: {{ .Values.serviceAccount.serviceAccountName }}
+      {{- end }}
       containers:
-      - name: hello
-        image: nginxdemos/hello:0.4-plain-text
-        imagePullPolicy: IfNotPresent
-        securityContext:
-          # allowPrivilegeEscalation: false
-          # privileged: false
-          # readOnlyRootFilesystem: true
-          # runAsNonRoot: true
-          # runAsUser: 1001
-          # runAsGroup: 1001
-        startupProbe:
-          httpGet:
-            path: /
-            port: 80
-          initialDelaySeconds: 10
-          failureThreshold: 3
-        resources:
-          requests:
-            memory: "30Mi"
-            cpu: "30m"
-          limits:
-            memory: "50Mi"
-            cpu: "100m"
+      - name: hello-blue
+        image: {{ include "nginx.image" . }}
+        imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+        {{- if .Values.containerSecurityContext.enabled }}
+        securityContext: {{- omit .Values.containerSecurityContext "enabled" | toYaml | nindent 10 }}
+        {{- end }}
+        {{- if .Values.startupProbe.enabled }}
+        startupProbe: {{- omit .Values.startupProbe "enabled" | toYaml | nindent 10 }}
+        {{- end }}
+        resources: {{- .Values.resources | toYaml | nindent 10}}
+        {{- if and .Values.volumeMounts .Values.volumes }}
         volumeMounts:
-        - name: openebs-hostpath
-          mountPath: /var/log/nginx
-      volumes:
-      - name: emptydir
-        emptyDir: {}
-      - name: openebs-hostpath
-        persistentVolumeClaim:
-          claimName: nginx-pvc
+        - name: {{ .Values.volumeMounts.openebsHostpath.name }}
+          mountPath: {{ .Values.volumeMounts.mountPath }}
+        {{- end }}
+      {{- if .Values.volumes }}
+      volumes: {{- .Values.volumes | toYaml | nindent 6 }}
+      {{- end }}
 ---
 {{- /*
 Author KYH.
 green app deployment
 */}}
-apiVersion: apps/v1
+apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
 kind: Deployment
 metadata:
   labels:
     app: nginx-green-deployment
   name: nginx-green-deployment
 spec:
-  replicas: 3
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
   selector:
     matchLabels:
       app: green
-  strategy: {}
+  {{- if .Values.updateStrategy }}
+  strategy: {{- toYaml .Values.updateStrategy | nindent 4 }}
+  {{- end }}
   template:
     metadata:
-      creationTimestamp: null
       labels:
         app: green
     spec:
-      serviceAccountName: nginx-sa
+      {{- if .Values.serviceAccount.enabled }}
+      serviceAccountName: {{ .Values.serviceAccount.serviceAccountName }}
+      {{- end }}
       containers:
-      - name: hello
-        image: nginxdemos/hello:0.4-plain-text
-        imagePullPolicy: IfNotPresent
-        # securityContext:
-        #   allowPrivilegeEscalation: false
-        #   privileged: false
-        #   readOnlyRootFilesystem: true
-        #   runAsNonRoot: true
-        startupProbe:
-          httpGet:
-            path: /
-            port: 80
-          initialDelaySeconds: 10
-          failureThreshold: 3
-        resources:
-          requests:
-            memory: "30Mi"
-            cpu: "30m"
-          limits:
-            memory: "50Mi"
-            cpu: "100m"
+      - name: hello-green
+        image: {{ include "nginx.image" . }}
+        imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+        {{- if .Values.containerSecurityContext.enabled }}
+        securityContext: {{- omit .Values.containerSecurityContext "enabled" | toYaml | nindent 10 }}
+        {{- end }}
+        {{- if .Values.startupProbe.enabled }}
+        startupProbe: {{- omit .Values.startupProbe "enabled" | toYaml | nindent 10 }}
+        {{- end }}
+        resources: {{- .Values.resources | toYaml | nindent 10}}
+        {{- if and .Values.volumeMounts .Values.volumes }}
         volumeMounts:
-        - name: emptydir
-          mountPath: /var/log/nginx
-      volumes:
-      - name: emptydir
-        emptyDir: {}
-      - name: openebs-hostpath
-        persistentVolumeClaim:
-          claimName: nginx-pvc
+        - name: {{ .Values.volumeMounts.emptydir.name }}
+          mountPath: {{ .Values.volumeMounts.mountPath }}
+        {{- end }}
+      {{- if .Values.volumes }}
+      volumes: {{- .Values.volumes | toYaml | nindent 6 }}
+      {{- end }}
