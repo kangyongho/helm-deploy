@@ -7,11 +7,4 @@ kind: Role
 metadata:
   name: podreader-role
   namespace: study-helm
-rules:
-- apiGroups:
-  - ""
-  resources:
-  - pods
-  verbs:
-  - get
-  - list
+rules: {{- toYaml .Values.role.rules | nindent 2 }}

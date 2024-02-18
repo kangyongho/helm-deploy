@@ -118,6 +118,18 @@ pvc:
     requests:
       storage: 1Gi
 
+## @section role
+##
+role:
+  rules:
+  - apiGroups:
+    - ""
+    resources:
+    - pods
+    verbs:
+    - get
+    - list
+
 
 
 

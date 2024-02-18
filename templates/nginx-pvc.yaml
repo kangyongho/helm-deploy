@@ -7,6 +7,6 @@ metadata:
   namespace: study-helm
 spec:
   storageClassName: openebs-hostpath
-  accessModes: {{ toYaml .Values.pvc.accessModes | nindent 2 }}
+  accessModes: {{- toYaml .Values.pvc.accessModes | nindent 2 }}
   volumeMode: {{ .Values.pvc.volumeMode }}
-  resources: {{ toYaml .Values.pvc.resources | nindent 4 }}
+  resources: {{- toYaml .Values.pvc.resources | nindent 4 }}
