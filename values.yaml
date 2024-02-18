@@ -1,89 +1,26 @@
+## @section deployment
+##
 global:
   imageRegistry: ""
-  ## E.g.
-  ## imagePullSecrets:
-  ##   - myRegistryKeySecretName
-  ##
   imagePullSecrets: []
-## @section NGINX parameters
 
-## Bitnami NGINX image version
-## ref: https://hub.docker.com/r/bitnami/nginx/tags/
-## @param image.registry [default: REGISTRY_NAME] NGINX image registry
-## @param image.repository [default: REPOSITORY_NAME/nginx] NGINX image repository
-## @skip image.tag NGINX image tag (immutable tags are recommended)
-## @param image.digest NGINX image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag
-## @param image.pullPolicy NGINX image pull policy
-## @param image.pullSecrets Specify docker-registry secret names as an array
-## @param image.debug Set to true if you would like to see extra information on logs
-##
 image:
-  # registry: docker.io
-  # repository: bitnami/nginx
-  # tag: 1.25.3-debian-11-r7
-  # digest: ""
   repository: nginxdemos/hello
   tag: 0.4-plain-text
-  digest: ""
-  ## Specify a imagePullPolicy
-  ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
-  ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
-  ##
   pullPolicy: IfNotPresent
-  ## Optionally specify an array of imagePullSecrets.
-  ## Secrets must be manually created in the namespace.
-  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
-  ## E.g.:
-  ## pullSecrets:
-  ##   - myRegistryKeySecretName
-  ##
-  pullSecrets: []
-  ## Set to true if you would like to see extra information on logs
-  ##
-  debug: false
-## @param kubeVersion Force target Kubernetes version (using Helm capabilities if not set)
-##
+
 kubeVersion: ""
-## @param replicaCount Number of NGINX replicas to deploy
-##
+
 replicaCount: 3
-## Autoscaling parameters
-## @param autoscaling.enabled Enable autoscaling for NGINX deployment
-## @param autoscaling.minReplicas Minimum number of replicas to scale back
-## @param autoscaling.maxReplicas Maximum number of replicas to scale out
-## @param autoscaling.targetCPU Target CPU utilization percentage
-## @param autoscaling.targetMemory Target Memory utilization percentage
-##
-autoscaling:
-  enabled: true
-  minReplicas: ""
-  maxReplicas: ""
-  targetCPU: ""
-  targetMemory: ""
-## @param updateStrategy.type NGINX deployment strategy type
-## @param updateStrategy.rollingUpdate NGINX deployment rolling update configuration parameters
-## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
-##
+
 updateStrategy:
   type: RollingUpdate
   rollingUpdate: {}
-## @param serviceAccount
-## serviceAccount setting
+
 serviceAccount:
   enabled: true
   serviceAccountName: nginx-sa
-## NGINX containers' Security Context.
-## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
-## @param containerSecurityContext.enabled Enabled containers' Security Context
-## @param containerSecurityContext.seLinuxOptions [object,nullable] Set SELinux options in container
-## @param containerSecurityContext.runAsUser Set containers' Security Context runAsUser
-## @param containerSecurityContext.runAsNonRoot Set container's Security Context runAsNonRoot
-## @param containerSecurityContext.privileged Set container's Security Context privileged
-## @param containerSecurityContext.readOnlyRootFilesystem Set container's Security Context readOnlyRootFilesystem
-## @param containerSecurityContext.allowPrivilegeEscalation Set container's Security Context allowPrivilegeEscalation
-## @param containerSecurityContext.capabilities.drop List of capabilities to be dropped
-## @param containerSecurityContext.seccompProfile.type Set container's Security Context seccomp profile
-## tip: nginxdemos/hello 쪽은 root 권한 필요함 enable false로 두기. bitnami/nginx는 enable true로 두기.
+
 ## tip: 컨테이너 이미지에 따라 달라진다. 컨테이너 이미지 빌드시 권한 고려해야 함
 containerSecurityContext:
   enabled: false
@@ -97,15 +34,7 @@ containerSecurityContext:
     drop: ["ALL"]
   seccompProfile:
     type: "RuntimeDefault"
-## NGINX containers' startup probe.
-## ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes
-## @param startupProbe.enabled Enable startupProbe
-## @param startupProbe.initialDelaySeconds Initial delay seconds for startupProbe
-## @param startupProbe.periodSeconds Period seconds for startupProbe
-## @param startupProbe.timeoutSeconds Timeout seconds for startupProbe
-## @param startupProbe.failureThreshold Failure threshold for startupProbe
-## @param startupProbe.successThreshold Success threshold for startupProbe
-##
+
 startupProbe:
   enabled: true
   initialDelaySeconds: 10
@@ -116,15 +45,11 @@ startupProbe:
   httpGet:
     path: /
     port: 80
-## NGINX Prometheus exporter resource requests and limits
-## ref: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
-## We usually recommend not to specify default resources and to leave this as a conscious
-## choice for the user. This also increases chances charts run on environments with little
-## resources, such as Minikube. If you do want to specify resources, uncomment the following
-## lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-## @param metrics.resources.limits The resources limits for the NGINX Prometheus exporter container
-## @param metrics.resources.requests The requested resources for the NGINX Prometheus exporter container
-##
+
+containerPorts:
+  http: 80
+  https: ""
+
 resources:
   requests:
     memory: "30Mi"
@@ -134,17 +59,31 @@ resources:
     memory: "50Mi"
     cpu: "100m"
   # limits: {}
-## volumeMounts
+
 volumeMounts:
   emptydir:
     name: emptydir
   openebsHostpath:
     name: openebs-hostpath
   mountPath: /var/log/nginx
-## volumes
+
 volumes:
 - name: emptydir
   emptyDir: {}
 - name: openebs-hostpath
   persistentVolumeClaim:
     claimName: nginx-pvc
+
+## @section service
+##
+service:
+  type: LoadBalancer
+  ports:
+    http: 80
+    https: 443
+  nodePorts:
+    http: ""
+    https: ""
+  targetPort:
+    http: http
+    https: https

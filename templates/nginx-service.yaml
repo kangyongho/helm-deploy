@@ -11,9 +11,18 @@ metadata:
   name: nginx-blue-service
 spec:
   ports:
-  - port: 80
+  {{- if .Values.containerPorts.http }}
+  - name: http
+    port: {{ .Values.service.ports.http }}
     protocol: TCP
-    targetPort: 80
+    targetPort: {{ .Values.service.targetPort.http }}
+  {{- end }}
+  {{- if .Values.containerPorts.https }}
+  - name: https
+    port: {{ .Values.service.ports.https }}
+    protocol: TCP
+    targetPort: {{ .Values.service.targetPort.https }}
+  {{- end }}
   selector:
     app: blue
   type: null
@@ -32,9 +41,18 @@ metadata:
   name: nginx-green-service
 spec:
   ports:
-  - port: 80
+  {{- if .Values.containerPorts.http }}
+  - name: http
+    port: {{ .Values.service.ports.http }}
     protocol: TCP
-    targetPort: 80
+    targetPort: {{ .Values.service.targetPort.http }}
+  {{- end }}
+  {{- if .Values.containerPorts.https }}
+  - name: https
+    port: {{ .Values.service.ports.https }}
+    protocol: TCP
+    targetPort: {{ .Values.service.targetPort.https }}
+  {{- end }}
   selector:
     app: green
   type: null

@@ -9,9 +9,7 @@ metadata:
     app: nginx-blue-deployment
   name: nginx-blue-deployment
 spec:
-  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
-  {{- end }}
   selector:
     matchLabels:
       app: blue
@@ -30,6 +28,9 @@ spec:
       - name: hello-blue
         image: {{ include "nginx.image" . }}
         imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.containerPorts.http }}
         {{- if .Values.containerSecurityContext.enabled }}
         securityContext: {{- omit .Values.containerSecurityContext "enabled" | toYaml | nindent 10 }}
         {{- end }}
@@ -57,9 +58,7 @@ metadata:
     app: nginx-green-deployment
   name: nginx-green-deployment
 spec:
-  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
-  {{- end }}
   selector:
     matchLabels:
       app: green
@@ -78,6 +77,9 @@ spec:
       - name: hello-green
         image: {{ include "nginx.image" . }}
         imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.containerPorts.http }}
         {{- if .Values.containerSecurityContext.enabled }}
         securityContext: {{- omit .Values.containerSecurityContext "enabled" | toYaml | nindent 10 }}
         {{- end }}
