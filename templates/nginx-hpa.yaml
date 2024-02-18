@@ -9,25 +9,13 @@ metadata:
   namespace: study-helm
 spec:
   maxReplicas: 10
-  minReplicas: 3
+  minReplicas: {{ .Values.replicaCount }}
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
     name: nginx-blue-deployment
-  # targetCPUUtilizationPercentage: 50
-  metrics:
-  - type: Resource
-    resource:
-      name: memory
-      target:
-        type: Utilization
-        averageUtilization: 50
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 50
+  # targetCPUUtilizationPercentage: 50 # autoscaling/v1
+  metrics: {{ toYaml .Values.hpa.resource | nindent 2 }}
 ---
 {{- /*
 Author KYH.
@@ -39,22 +27,10 @@ metadata:
   name: nginx-green-hpa
 spec:
   maxReplicas: 10
-  minReplicas: 3
+  minReplicas: {{ .Values.replicaCount }}
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
     name: nginx-green-deployment
-  # targetCPUUtilizationPercentage: 50
-  metrics:
-  - type: Resource
-    resource:
-      name: memory
-      target:
-        type: Utilization
-        averageUtilization: 50
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 50
+  # targetCPUUtilizationPercentage: 50 # autoscaling/v1
+  metrics: {{ toYaml .Values.hpa.resource | nindent 2 }}
