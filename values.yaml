@@ -107,3 +107,24 @@ hpa:
       target:
         type: Utilization
         averageUtilization: 50
+
+## @section pvc
+##
+pvc:
+  accessModes:
+  - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 1Gi
+
+
+
+
+
+
+
+
+
+
+
