@@ -7,11 +7,5 @@ kind: RoleBinding
 metadata:
   name: podreader-rolebinding
   namespace: study-helm
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: podreader-role
-subjects:
-- kind: ServiceAccount
-  name: nginx-sa
-  namespace: study-helm
+roleRef: {{- toYaml .Values.rolebinding.roleRef | nindent 2 }}
+subjects: {{- toYaml .Values.rolebinding.subjects | nindent 2 }}

@@ -130,7 +130,17 @@ role:
     - get
     - list
 
-
+## @section role binding
+##
+rolebinding:
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: podreader-role
+  subjects:
+  - kind: ServiceAccount
+    name: nginx-sa
+    namespace: study-helm
 
 
 
