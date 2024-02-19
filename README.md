@@ -27,4 +27,4 @@
 5. make argocd crd
 6. deploy by argocd
 
-[0]: http
+[0]: https://bit.ly/49Bcw07
