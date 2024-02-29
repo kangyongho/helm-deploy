@@ -9,7 +9,9 @@ metadata:
     app: nginx-blue-deployment
   name: nginx-blue-deployment
 spec:
+  {{- if not .Values.hpa }}
   replicas: {{ .Values.replicaCount }}
+  {{- end }}
   selector:
     matchLabels:
       app: blue
@@ -58,7 +60,9 @@ metadata:
     app: nginx-green-deployment
   name: nginx-green-deployment
 spec:
+  {{- if not .Values.hpa }}
   replicas: {{ .Values.replicaCount }}
+  {{- end }}
   selector:
     matchLabels:
       app: green
